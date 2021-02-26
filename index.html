@@ -1,5 +1,103 @@
 <html>
-  <body>
-    <h1>Hololive Web Service</h1>
-  </body>
+<head>
+<title>Bond Web Service Demo</title>
+<link rel="stylesheet" href="css/hololive.css"/>
+<style>
+body {font-family:georgia;}
+</style>
+<script src="https://code.jquery.com/jquery-latest.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+
+function serverSetup(server,cat){
+   server = server.toLowerCase();
+   let url = "";
+   if(server == "php"){//use web service
+       url = "api.php?cat=" + cat;
+   }else{//server is HTML only - simulate web service
+       if(cat == "gen"){//box office
+           url = "data/hololiveGen.js";
+       }else{//year
+           url = "data/hololiveDebut.js"; 
+       }
+   }
+   return url;
+}
+
+$(document).ready(function() {  
+
+	$('.category').click(function(e){
+        e.preventDefault(); //stop default action of the link
+		cat = $(this).attr("href");  //get category from URL
+		loadAJAX(cat);  //load AJAX and parse JSON file
+	});
+});	
+
+function loadAJAX(cat)
+{
+   /* url can be run on a server running PHP or
+      use the a standard HTML server
+ 
+      Indicate below if server is PHP or HTML
+ 
+      let url = serverSetup("php",cat); //setup to run against PHP server
+      let url = serverSetup("html",cat); //setup to run against HTML server
+   */
+  
+   let url = serverSetup("html",cat);
+  
+   $.ajax({
+       type:"GET",
+       dataType: "json",
+       url:url,
+       success:holoJSON
+   });
+}
+
+    
+function toConsole(data)
+{//return data to console for JSON examination
+	console.log(data); //to view,use Chrome console, ctrl + shift + j
+}
+
+function holoJSON(data){
+//JSON processing data goes here
+	//toConsole(data);
+	//$("#output").text(JSON.stringify(data));
+
+    //clear the previous films
+    $("#members").html("");
+
+    //write webservice title
+    $("#catTitle").html(data.title);
+
+	$.each(data.members, function(i, item){
+		let text = `
+                <b>Name</b>: ${item.Name}<br>
+                <b>Generation</b>: ${item.Generation}<br>
+                <b>Age</b>: ${item.Age}<br>
+                <b>Gender</b>: ${item.Gender}<br>
+                <b>Birthday</b>: ${item.Birthday}<br>
+                <b>Height</b>: ${item.Height}<br>
+                <b>Youtube Debut Day</b>: ${item.YoutubeDebutDay}<br>
+                
+                <div class="pic"><img src="images/${item.Image}"></div>
+				`;
+
+		$("<div></div>").html(text).appendTo("#members");
+	});
+}
+
+</script>
+</head>
+	<body>
+	<h1>Hololive Web Service</h1>
+		<a href="gen" class="category">Hololive Members by Generation</a><br />
+		<a href="debut" class="category">Hololive Members by Debut Day</a>
+		<h3 id="catTitle">Title Will Go Here</h3>
+		<div id="members">
+			
+		</div>
+		<div id="output">Results go here</div>
+	</body>
 </html>
