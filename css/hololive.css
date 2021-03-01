@@ -15,7 +15,7 @@ body {font-family:georgia;}
 	position:relative; /* required to place #pic to right */
 }
 
-#members h3 {
+#members h2 {
 	font-family:georgia;
 	padding:5px;
 	color:#fff;
